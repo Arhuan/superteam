@@ -10,7 +10,7 @@ stats_pages = [
     "https://www.basketball-reference.com/leagues/NBA_2016_per_game.html"
 ]
 
-stats_years = [
+stats_filenames = [
     "stats-2019",
     "stats-2018",
     "stats-2017",
@@ -35,7 +35,7 @@ def get_data(pages, filenames):
         r = requests.get(page)
         save_html(r.content, f"{filenames[i]}.html") 
 
-def parse_stats_html(html):
+def parse_html(html):
     soup = BeautifulSoup(html, "html.parser")
    
     data = []
@@ -75,10 +75,15 @@ def parse_stats_html(html):
     return data
 
 def create_data_json():
-    for stats in stats_years:
+    for stats in stats_filenames:
         with open(f"{stats}.json", "w") as f:
-            data = parse_stats_html(open_html(f"{stats}.html"))
+            data = parse_html(open_html(f"{stats}.html"))
             json.dump(data, f)
 
-get_data(stats_pages, stats_years)
-create_data_json()
+def main():
+    get_data(stats_pages, stats_filenames)
+    create_data_json()
+
+if __name__ == "__main__":
+    main()
+
