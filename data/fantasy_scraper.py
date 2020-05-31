@@ -1,6 +1,8 @@
+import json
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -24,16 +26,46 @@ fantasy_filenames = [
 def get_data(pages, filenames):
     options = Options()
     driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+    driver.implicitly_wait(10)
+    
+    try:
+        for i, page in enumerate(pages):
+            with open(f"{fantasy_filenames[i]}.json", "w") as f:
+                driver.get(page)
 
-    for page in pages:
-        driver.get(page)
+                wait_for_table_data(driver)
+                hide_popups(driver)
+                load_all_rows(driver)
 
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_all_elements_located((By.XPATH, "//td")))
+                data = parse_html(driver.page_source)
+                json.dump(data, f)
+    finally:
+        driver.quit()
 
-        parse_html(driver.page_source)
+def hide_popups(driver):
+    try:
+        driver.find_element_by_xpath("//button[@class='fs-close-button']").click()
+    except:
+        print("Ad popup not visible")
+    try:
+        driver.find_element_by_xpath("//div[@class='cookieinfo-close']").click()
+    except:
+        print("Cookies popup not visible")
 
-    driver.quit()
+def wait_for_table_data(driver):
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_all_elements_located((By.XPATH, "//td")))
+
+def load_all_rows(driver):
+    # Pick 20 for now as that guarantees we do enough iterations to get all the data
+    # TODO: implement a function that checks to see if the table has loaded all possible new data so we can exit earlier
+    for i in range(20):
+        load_more_button = driver.find_element_by_xpath("//div[@ng-app='fantasydata']//a[@ng-hide='LoadingMore']")
+
+        actions = ActionChains(driver)
+        actions.move_to_element(load_more_button).click(load_more_button).perform()
+
+        wait_for_table_data(driver)
 
 def parse_html(html):
     soup = BeautifulSoup(html, "html.parser")
