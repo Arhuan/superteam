@@ -42,7 +42,7 @@ def parse_html(html):
     rows = soup.select("tbody tr")
 
     for row in rows:
-        if row.get("class")[0] == "thead":
+        if "thead" in row.get("class") or "partial_table" in row.get("class"):
             continue
 
         player = dict()
