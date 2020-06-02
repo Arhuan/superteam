@@ -32,10 +32,14 @@ def get_data(pages, filenames):
         for i, page in enumerate(pages):
             with open(f"{fantasy_filenames[i]}.json", "w") as f:
                 driver.get(page)
-
+                
+                driver.find_element_by_xpath("//a[@ng-click='SetPageSize(300);']").click()
                 wait_for_table_data(driver)
                 hide_popups(driver)
                 load_all_rows(driver)
+
+                # TODO: bit of a hack, revisit and fix later
+                wait_for_table_data(driver)
 
                 data = parse_html(driver.page_source)
                 json.dump(data, f)
@@ -57,9 +61,8 @@ def wait_for_table_data(driver):
     wait.until(EC.presence_of_all_elements_located((By.XPATH, "//td")))
 
 def load_all_rows(driver):
-    # Pick 20 for now as that guarantees we do enough iterations to get all the data
     # TODO: implement a function that checks to see if the table has loaded all possible new data so we can exit earlier
-    for i in range(20):
+    for i in range(3):
         load_more_button = driver.find_element_by_xpath("//div[@ng-app='fantasydata']//a[@ng-hide='LoadingMore']")
 
         actions = ActionChains(driver)
@@ -77,8 +80,8 @@ def parse_html(html):
     for row in rows:
         player = dict()
 
-        player["name"] = int(row.select_one("span[ng-bind='dataItem.Rank']").text)
-        player["rank"] = row.select_one("a").text
+        player["rank"] = int(row.select_one("span[ng-bind='dataItem.Rank']").text)
+        player["name"] = row.select_one("a").text
         print(player)
         data.append(player)
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 
 def get_data():
@@ -7,6 +8,17 @@ def get_data():
 
     print(data)
     print(labels)
+
+    labels = clean_labels(data, labels)
+
+    print(labels)
+
+def clean_labels(data, labels):
+    """Prunes labels that do not have a matching player in data"""
+
+    players = set(data["name"].tolist())
+
+    return labels[labels['name'].isin(players)]
 
 if __name__ == "__main__":
     get_data()
