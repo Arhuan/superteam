@@ -140,3 +140,4 @@ cython_debug/
 
 # Ignore HTML data files
 data/*.html
+data/*.json
