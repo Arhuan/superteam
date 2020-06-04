@@ -1,4 +1,5 @@
 import json
+import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -6,6 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from unidecode import unidecode
 
 DRIVER_PATH = "/usr/local/share/chromedriver"
 
@@ -81,8 +83,10 @@ def parse_html(html):
         player = dict()
 
         player["rank"] = int(row.select_one("span[ng-bind='dataItem.Rank']").text)
-        player["name"] = row.select_one("a").text
+        player["name"] = re.sub(r"\W+", "",  unidecode(row.select_one("a").text))
+        
         print(player)
+
         data.append(player)
 
     return data

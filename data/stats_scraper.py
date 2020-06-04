@@ -1,7 +1,9 @@
 import json
 import pathlib
+import re
 import requests
 from bs4 import BeautifulSoup
+from unidecode import unidecode
 
 stats_pages = [
     "https://www.basketball-reference.com/leagues/NBA_2019_per_game.html",
@@ -47,8 +49,8 @@ def parse_html(html):
 
         player = dict()
 
-        player["name"] = row.select_one("td[data-stat='player'] a").text
-        player["position"] = row.select_one("td[data-stat='pos']").text
+        player["name"] = re.sub(r"\W+", "", unidecode(row.select_one("td[data-stat='player'] a").text))
+        player["position"] = re.sub(r"\W+", "", unidecode(row.select_one("td[data-stat='pos']").text))
         player["age"] = int(row.select_one("td[data-stat='age']").text)
 
         fg_per_game = float(row.select_one("td[data-stat='fg_per_g']").text)
