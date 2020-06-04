@@ -83,7 +83,7 @@ def parse_html(html):
         player = dict()
 
         player["rank"] = int(row.select_one("span[ng-bind='dataItem.Rank']").text)
-        player["name"] = re.sub(r"\W+", "",  unidecode(row.select_one("a").text))
+        player["name"] = re.sub(r"\W+", "",  unidecode(row.select_one("a").text)).lower()
         
         print(player)
 

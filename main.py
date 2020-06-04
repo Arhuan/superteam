@@ -27,14 +27,17 @@ def get_data():
         labels = pd.read_json(json["fantasy"])
 
         data, labels = clean_data(data, labels)
+
+        print(data)
+        print(labels)
         
 def clean_data(data, labels):
     """Remove rows that do not have a corresponding matching data/label row"""
         
     data_players = set(data["name"].tolist())
     label_players = set(labels["name"].tolist())
-
-    return data[data["name"].isin(label_players)], labels[labels["name"].isin(data_players)]
+    
+    return data[data["name"].isin(label_players)].reset_index(), labels[labels["name"].isin(data_players)].reset_index()
 
 if __name__ == "__main__":
     get_data()
