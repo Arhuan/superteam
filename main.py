@@ -27,18 +27,28 @@ def get_data():
         labels = pd.read_json(json["fantasy"])
 
         data, labels = clean_data(data, labels)
-
-        print(data)
-        print(labels)
+        
+        return data.to_numpy(), labels.to_numpy()
         
 def clean_data(data, labels):
-    """Remove rows that do not have a corresponding matching data/label row"""
+    """Cleans up and rearranges the data and labels
+
+    * Remove rows that do not have a corresponding matching data/label row
+    * Match each row in data to each row in labels
+    * Removes the names from the labels once they are matched with the proper row in data
+    """
         
     data_players = set(data["name"].tolist())
     label_players = set(labels["name"].tolist())
     
-    return data[data["name"].isin(label_players)].reset_index(), labels[labels["name"].isin(data_players)].reset_index()
+    pruned_data = data[data["name"].isin(label_players)]
+    pruned_labels = labels[labels["name"].isin(data_players)]
+    
+    sorted_data = pruned_data.sort_values(by=["name"]).reset_index(drop=True)
+    sorted_labels = pruned_labels.sort_values(by=["name"]).reset_index(drop=True)
+    
+    return sorted_data, sorted_labels.drop(columns=["name"])
 
 if __name__ == "__main__":
-    get_data()
+    X, y = get_data()
 
