@@ -2,23 +2,39 @@ import pandas as pd
 import numpy as np
 import json
 
+data_jsons = [
+    {
+        "stats": "./data/stats-2019.json",
+        "fantasy": "./data/fantasy-2019.json"
+    },
+    {
+        "stats": "./data/stats-2018.json",
+        "fantasy": "./data/fantasy-2018.json"
+    },
+    {
+        "stats": "./data/stats-2017.json",
+        "fantasy": "./data/fantasy-2017.json"
+    },
+    {
+        "stats": "./data/stats-2016.json",
+        "fantasy": "./data/fantasy-2016.json"
+    }
+]
+
 def get_data():
-    data = pd.read_json("./data/stats-2016.json")
-    labels = pd.read_json("./data/fantasy-2016.json")
+    for json in data_jsons:
+        data = pd.read_json(json["stats"])
+        labels = pd.read_json(json["fantasy"])
 
-    print(data)
-    print(labels)
+        data, labels = clean_data(data, labels)
+        
+def clean_data(data, labels):
+    """Remove rows that do not have a corresponding matching data/label row"""
+        
+    data_players = set(data["name"].tolist())
+    label_players = set(labels["name"].tolist())
 
-    labels = clean_labels(data, labels)
-
-    print(labels)
-
-def clean_labels(data, labels):
-    """Prunes labels that do not have a matching player in data"""
-
-    players = set(data["name"].tolist())
-
-    return labels[labels['name'].isin(players)]
+    return data[data["name"].isin(label_players)], labels[labels["name"].isin(data_players)]
 
 if __name__ == "__main__":
     get_data()
