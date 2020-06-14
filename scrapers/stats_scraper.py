@@ -28,14 +28,15 @@ def open_html(path):
         return f.read()
 
 def get_data(pages, filenames):
+    pathlib.Path("../data").mkdir(parents=True, exist_ok=True)
     for i, page in enumerate(pages):
-        path = pathlib.Path(f"{filenames[i]}.html")
+        path = pathlib.Path(f"../data/{filenames[i]}.html")
 
         if path.exists():
             continue
 
         r = requests.get(page)
-        save_html(r.content, f"{filenames[i]}.html") 
+        save_html(r.content, f"../data/{filenames[i]}.html") 
 
 def parse_html(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -51,7 +52,7 @@ def parse_html(html):
 
         player["name"] = re.sub(r"\W+", "", unidecode(row.select_one("td[data-stat='player'] a").text)).lower()
         player["position"] = re.sub(r"\W+", "", unidecode(row.select_one("td[data-stat='pos']").text)).lower()
-        player["age"] = int(row.select_one("td[data-stat='age']").text)
+        player["age"] = float(row.select_one("td[data-stat='age']").text)
 
         fg_per_game = float(row.select_one("td[data-stat='fg_per_g']").text)
         fga_per_game = float(row.select_one("td[data-stat='fga_per_g']").text)
@@ -78,8 +79,8 @@ def parse_html(html):
 
 def create_data_json():
     for stats in stats_filenames:
-        with open(f"{stats}.json", "w") as f:
-            data = parse_html(open_html(f"{stats}.html"))
+        with open(f"../data/{stats}.json", "w") as f:
+            data = parse_html(open_html(f"../data/{stats}.html"))
             json.dump(data, f)
 
 def main():

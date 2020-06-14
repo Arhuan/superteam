@@ -1,4 +1,5 @@
 import json
+import pathlib
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -26,13 +27,15 @@ fantasy_filenames = [
 ]
 
 def get_data(pages, filenames):
+    pathlib.Path("../data").mkdir(parents=True, exist_ok=True)
+
     options = Options()
     driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
     driver.implicitly_wait(10)
     
     try:
         for i, page in enumerate(pages):
-            with open(f"{fantasy_filenames[i]}.json", "w") as f:
+            with open(f"../data/{fantasy_filenames[i]}.json", "w") as f:
                 driver.get(page)
                 
                 driver.find_element_by_xpath("//a[@ng-click='SetPageSize(300);']").click()
@@ -82,7 +85,7 @@ def parse_html(html):
     for row in rows:
         player = dict()
 
-        player["rank"] = int(row.select_one("span[ng-bind='dataItem.Rank']").text)
+        player["rank"] = float(row.select_one("span[ng-bind='dataItem.Rank']").text)
         player["name"] = re.sub(r"\W+", "",  unidecode(row.select_one("a").text)).lower()
         
         print(player)

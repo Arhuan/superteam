@@ -31,12 +31,12 @@ def get_data():
     for json in data_jsons:
         data = pd.read_json(json["stats"])
         labels = pd.read_json(json["fantasy"])
+        
+        cleaned_data, cleaned_labels = clean_data(data, labels)
 
-        data_final = data_final.append(data)
-        labels_final = labels_final.append(labels)
+        data_final = data_final.append(cleaned_data)
+        labels_final = labels_final.append(cleaned_labels)
 
-    data_final, labels_final = clean_data(data_final, labels_final)
-              
     return data_final.to_numpy(), labels_final.to_numpy()
         
 def clean_data(data, labels):
@@ -61,7 +61,9 @@ def clean_data(data, labels):
 if __name__ == "__main__":
     X, y = get_data()
 
+    print(X[:,2:], y)
+
     model = lin_reg.LinearRegression(lammy=1)
     
-    model.fit(X, y)
+    model.fit(X[:,2:], y)
 
