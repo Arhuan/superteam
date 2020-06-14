@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import json
+from models import lin_reg
 
 data_jsons = [
     {
@@ -22,16 +23,24 @@ data_jsons = [
 ]
 
 def get_data():
+    """Retrieve training and validation data as a numpy array"""
+    
+    data_final = pd.DataFrame()
+    labels_final = pd.DataFrame()
+
     for json in data_jsons:
         data = pd.read_json(json["stats"])
         labels = pd.read_json(json["fantasy"])
 
-        data, labels = clean_data(data, labels)
-        
-        return data.to_numpy(), labels.to_numpy()
+        data_final = data_final.append(data)
+        labels_final = labels_final.append(labels)
+
+    data_final, labels_final = clean_data(data_final, labels_final)
+              
+    return data_final.to_numpy(), labels_final.to_numpy()
         
 def clean_data(data, labels):
-    """Cleans up and rearranges the data and labels
+    """Cleans up and rearranges the data and labels, returns data and label DataFrames
 
     * Remove rows that do not have a corresponding matching data/label row
     * Match each row in data to each row in labels
@@ -51,4 +60,8 @@ def clean_data(data, labels):
 
 if __name__ == "__main__":
     X, y = get_data()
+
+    model = lin_reg.LinearRegression(lammy=1)
+    
+    model.fit(X, y)
 
