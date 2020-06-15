@@ -56,15 +56,27 @@ def parse_html(html):
 
         fg_per_game = float(row.select_one("td[data-stat='fg_per_g']").text)
         fga_per_game = float(row.select_one("td[data-stat='fga_per_g']").text)
-        player["fg_percentage"] = fg_per_game / fga_per_game if (fga_per_game != 0.0) else None
+
+        if (fga_per_game == 0.0):
+            continue
+
+        player["fg_percentage"] = fg_per_game / fga_per_game
 
         ft_per_game = float(row.select_one("td[data-stat='ft_per_g']").text) 
         fta_per_game = float(row.select_one("td[data-stat='fta_per_g']").text) 
-        player["ft_percentage"] = ft_per_game / fta_per_game if (fta_per_game != 0.0) else None
+
+        if (fta_per_game == 0.0):
+            continue
+
+        player["ft_percentage"] = ft_per_game / fta_per_game
 
         fg3_per_game = float(row.select_one("td[data-stat='fg3_per_g']").text)
         fg3a_per_game = float(row.select_one("td[data-stat='fg3a_per_g']").text)
-        player["3pt_percentage"] = fg3_per_game / fg3a_per_game if (fg3a_per_game != 0.0) else None
+
+        if (fg3a_per_game == 0.0):
+            continue
+
+        player["3pt_percentage"] = fg3_per_game / fg3a_per_game
 
         player["points"] = float(row.select_one("td[data-stat='pts_per_g']").text)
         player["rebounds"] = float(row.select_one("td[data-stat='orb_per_g']").text) + float(row.select_one("td[data-stat='drb_per_g']").text)

@@ -5,20 +5,20 @@ from models import lin_reg
 
 data_jsons = [
     {
-        "stats": "./data/stats-2019.json",
-        "fantasy": "./data/fantasy-2019.json"
+        "stats": "../data/stats-2019.json",
+        "fantasy": "../data/fantasy-2019.json"
     },
     {
-        "stats": "./data/stats-2018.json",
-        "fantasy": "./data/fantasy-2018.json"
+        "stats": "../data/stats-2018.json",
+        "fantasy": "../data/fantasy-2018.json"
     },
     {
-        "stats": "./data/stats-2017.json",
-        "fantasy": "./data/fantasy-2017.json"
+        "stats": "../data/stats-2017.json",
+        "fantasy": "../data/fantasy-2017.json"
     },
     {
-        "stats": "./data/stats-2016.json",
-        "fantasy": "./data/fantasy-2016.json"
+        "stats": "../data/stats-2016.json",
+        "fantasy": "../data/fantasy-2016.json"
     }
 ]
 
@@ -37,7 +37,7 @@ def get_data():
         data_final = data_final.append(cleaned_data)
         labels_final = labels_final.append(cleaned_labels)
 
-    return data_final.to_numpy(), labels_final.to_numpy()
+    return data_final.drop(columns=["name", "position"]).to_numpy(dtype=np.float64), labels_final.to_numpy(dtype=np.float64)
         
 def clean_data(data, labels):
     """Cleans up and rearranges the data and labels, returns data and label DataFrames
@@ -61,9 +61,7 @@ def clean_data(data, labels):
 if __name__ == "__main__":
     X, y = get_data()
 
-    print(X[:,2:], y)
-
     model = lin_reg.LinearRegression(lammy=1)
     
-    model.fit(X[:,2:], y)
+    model.fit(X, y)
 
