@@ -61,6 +61,6 @@ def clean_data(data, labels):
 if __name__ == "__main__":
     X, y = get_data()
 
-    model = lin_reg.LinearRegression(lammy=1)
+    model = lin_reg.LinearRegression()
 
     model.fit(X, y)
