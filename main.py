@@ -87,7 +87,7 @@ if __name__ == "__main__":
     model.fit(X, y)
 
     y_hat = model.predict(X)
-    print("Training error: ", np.sum(np.abs(y_hat - y)))
+    print("Training error: ", np.mean(np.abs(y_hat - y)))
 
     y_hat = model.predict(X_test)
-    print("Testing error: ", np.sum(np.abs(y_hat - y_test)))
+    print("Testing error: ", np.mean(np.abs(y_hat - y_test)))
