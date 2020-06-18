@@ -5,10 +5,6 @@ from models import lin_reg
 
 data_jsons = [
     {
-        "stats": "./data/stats-2019.json",
-        "fantasy": "./data/fantasy-2019.json"
-    },
-    {
         "stats": "./data/stats-2018.json",
         "fantasy": "./data/fantasy-2018.json"
     },
@@ -22,6 +18,13 @@ data_jsons = [
     }
 ]
 
+test_data_json = [
+    {
+        "stats": "./data/stats-2019.json",
+        "fantasy": "./data/fantasy-2019.json"
+    }
+]
+
 def get_data():
     """Retrieve training and validation data as a numpy array"""
 
@@ -29,6 +32,23 @@ def get_data():
     labels_final = pd.DataFrame()
 
     for json in data_jsons:
+        data = pd.read_json(json["stats"])
+        labels = pd.read_json(json["fantasy"])
+
+        cleaned_data, cleaned_labels = clean_data(data, labels)
+
+        data_final = data_final.append(cleaned_data)
+        labels_final = labels_final.append(cleaned_labels)
+
+    return data_final.drop(columns=["name", "position"]).to_numpy(dtype=np.float64), labels_final.to_numpy(dtype=np.float64)
+
+def get_test_data():
+    """Get test data and labels as a numpy array"""
+
+    data_final = pd.DataFrame()
+    labels_final = pd.DataFrame()
+
+    for json in test_data_json:
         data = pd.read_json(json["stats"])
         labels = pd.read_json(json["fantasy"])
 
@@ -60,7 +80,14 @@ def clean_data(data, labels):
 
 if __name__ == "__main__":
     X, y = get_data()
+    X_test, y_test = get_test_data()
 
     model = lin_reg.LinearRegression()
 
     model.fit(X, y)
+
+    y_hat = model.predict(X)
+    print("Training error: ", np.sum(np.abs(y_hat - y)))
+
+    y_hat = model.predict(X_test)
+    print("Testing error: ", np.sum(np.abs(y_hat - y_test)))
